@@ -6,7 +6,13 @@
 /*   By: lukorman <lukorman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 16:03:55 by lukorman          #+#    #+#             */
-/*   Updated: 2024/11/25 16:05:47 by lukorman         ###   ########.fr       */
+/*   Updated: 2024/11/25 20:18:55 by lukorman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "get_next_line.h"
+
+char	*get_next_line(int fd)
+{
+
+}
