@@ -6,7 +6,7 @@
 /*   By: lukorman <lukorman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 16:03:55 by lukorman          #+#    #+#             */
-/*   Updated: 2024/11/26 20:26:20 by lukorman         ###   ########.fr       */
+/*   Updated: 2024/11/26 21:11:28 by lukorman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,13 +27,12 @@ char	*get_next_line(int fd)
 			file[fd].i++;
 		}
 		// renicialize everything to zero
-		file[fd].i = 0;
+		file[fd].i = 0; // isn't this line redundant? see line 23
 		file[fd].len = 0;
 		file[fd].i = 0;
 		file[fd].read_chars = NULL;
 		file[fd].rd = read(fd, file[fd].read_chars, BUFFER_SIZE);
 		if (file[fd].rd == ERROR)
-			return (free_buf(file->read_chars)); //to-do: understand better this return - especifically the argument to the free_buf ft
-
+			return (free_buf(file->read_chars));
 	}
 }
