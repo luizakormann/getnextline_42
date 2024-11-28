@@ -6,7 +6,7 @@
 /*   By: lukorman <lukorman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 16:03:55 by lukorman          #+#    #+#             */
-/*   Updated: 2024/11/26 21:11:28 by lukorman         ###   ########.fr       */
+/*   Updated: 2024/11/27 22:38:10 by lukorman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,19 +20,20 @@ char	*get_next_line(int fd)
 		return (NULL);
 	if (file[fd].i == 0 || file[fd].i >= file[fd].rd)
 	{
-		file[fd].i = 0; // new reading. needs to reset i to 0
-		while (file[fd].i < BUFFER_SIZE) // this loop will empy the .buf with \0 for each index position
-		{ // to-do: check for other possibilities, such as the creation of a free_buf function
+		file[fd].i = 0;
+		while (file[fd].i < BUFFER_SIZE)
+		{
 			file[fd].buf[file[fd].i] = '\0';
 			file[fd].i++;
 		}
-		// renicialize everything to zero
-		file[fd].i = 0; // isn't this line redundant? see line 23
 		file[fd].len = 0;
 		file[fd].i = 0;
 		file[fd].read_chars = NULL;
 		file[fd].rd = read(fd, file[fd].read_chars, BUFFER_SIZE);
 		if (file[fd].rd == ERROR)
-			return (free_buf(file->read_chars));
+			return (free_buf(file[fd].read_chars));
 	}
+	if (file[fd].rd <= 0 || file[fd].buf[file[fd].i] == '\0')
+		return (free_buf(file[fd].read_chars));
+	return (read_buffer(&file[fd]));
 }
