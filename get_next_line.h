@@ -6,7 +6,7 @@
 /*   By: lukorman <lukorman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 16:03:49 by lukorman          #+#    #+#             */
-/*   Updated: 2024/11/27 22:39:45 by lukorman         ###   ########.fr       */
+/*   Updated: 2024/12/03 23:51:59 by lukorman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 # include <stdlib.h>
 
 # ifndef BUFFER_SIZE
-#  define BUFFER_SIZE 42
+#  define BUFFER_SIZE 10
 # endif
 
 # define FD_O_LIMIT 1024
@@ -35,18 +35,16 @@ typedef struct s_read_file	t_read_file;
 struct s_read_file
 {
 	int			fd;
-	ssize_t		i;
-	ssize_t		len;
-	ssize_t		rd;
 	char		buf[BUFFER_SIZE];
-	t_buf_mngr	*read_chars;
+	ssize_t		i;
+	ssize_t		rd;
 };
 
 char		*get_next_line(int fd);
-char		*free_buf(t_buf_mngr *buf);
-t_buf_mngr	*node_manager(char c);
-void		add_node_manager(t_buf_mngr **read_chars, t_buf_mngr *new_char);
-char		*read_buffer(t_read_file *file);
-char		*write_line(t_read_file *file);
+t_buf_mngr	*create_node(char c);
+void		add_node(t_buf_mngr **head, char c);
+void		free_list(t_buf_mngr **head);
+char		*write_str(t_buf_mngr *head, size_t len);
+int			read_next_char(t_read_file *file);
 
 #endif

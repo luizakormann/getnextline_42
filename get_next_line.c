@@ -6,7 +6,7 @@
 /*   By: lukorman <lukorman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 16:03:55 by lukorman          #+#    #+#             */
-/*   Updated: 2024/11/27 22:38:10 by lukorman         ###   ########.fr       */
+/*   Updated: 2024/12/04 00:07:12 by lukorman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,25 +15,35 @@
 char	*get_next_line(int fd)
 {
 	static t_read_file	file[FD_O_LIMIT];
+	t_buf_mngr			*read_chars;
+	int					cur_c;
+	size_t				line_len;
+	char				*line;
 
-	if (fd > FD_O_LIMIT || fd < 0)
+	if (fd < 0 || fd >= FD_O_LIMIT || BUFFER_SIZE <= 0)
 		return (NULL);
-	if (file[fd].i == 0 || file[fd].i >= file[fd].rd)
+	file[fd].fd = fd;
+	read_chars = NULL;
+	cur_c = read_next_char(&file[fd]);
+	if (cur_c == 0)
+		return (NULL);
+	line_len = 0;
+	while (cur_c > 0)
 	{
-		file[fd].i = 0;
-		while (file[fd].i < BUFFER_SIZE)
+		add_node(&read_chars, (char)cur_c);
+		line_len++;
+		if (cur_c == '\n')
+			break ;
+		cur_c = read_next_char(&file[fd]);
+		if (cur_c == -1)
 		{
-			file[fd].buf[file[fd].i] = '\0';
-			file[fd].i++;
+			free_list(&read_chars);
+			return (NULL);
 		}
-		file[fd].len = 0;
-		file[fd].i = 0;
-		file[fd].read_chars = NULL;
-		file[fd].rd = read(fd, file[fd].read_chars, BUFFER_SIZE);
-		if (file[fd].rd == ERROR)
-			return (free_buf(file[fd].read_chars));
 	}
-	if (file[fd].rd <= 0 || file[fd].buf[file[fd].i] == '\0')
-		return (free_buf(file[fd].read_chars));
-	return (read_buffer(&file[fd]));
+	if (!read_chars)
+		return (NULL);
+	line = write_str(read_chars, line_len);
+	free_list(&read_chars);
+	return (line);
 }
