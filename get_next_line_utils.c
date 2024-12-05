@@ -6,7 +6,7 @@
 /*   By: lukorman <lukorman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 16:03:58 by lukorman          #+#    #+#             */
-/*   Updated: 2024/12/03 23:17:10 by lukorman         ###   ########.fr       */
+/*   Updated: 2024/12/05 18:08:20 by lukorman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,13 +46,13 @@ void	add_node(t_buf_mngr **head, char c)
 	}
 }
 
-void	free_list(t_buf_mngr **head)
+void	*free_list(t_buf_mngr **head)
 {
 	t_buf_mngr	*current;
 	t_buf_mngr	*next;
 
 	if (!head)
-		return ;
+		return (NULL);
 	current = *head;
 	while (current)
 	{
@@ -61,6 +61,7 @@ void	free_list(t_buf_mngr **head)
 		current = next;
 	}
 	*head = NULL;
+	return (NULL);
 }
 
 char	*write_str(t_buf_mngr *head, size_t len)
