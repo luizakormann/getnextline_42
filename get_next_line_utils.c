@@ -38,12 +38,9 @@ void	add_node(t_buf_mngr **head, char c)
 		return ;
 	}
 	current = *head;
-	if (current != NULL)
-	{
-		while (current->next)
-			current = current->next;
-		current->next = new_node;
-	}
+	while (current->next)
+		current = current->next;
+	current->next = new_node;
 }
 
 void	*free_list(t_buf_mngr **head)
@@ -51,7 +48,7 @@ void	*free_list(t_buf_mngr **head)
 	t_buf_mngr	*current;
 	t_buf_mngr	*next;
 
-	if (!head)
+	if (!head || !*head)
 		return (NULL);
 	current = *head;
 	while (current)
@@ -87,11 +84,13 @@ int	read_next_char(t_read_file *file)
 	if (file->i >= file->rd)
 	{
 		file->rd = read(file->fd, file->buf, BUFFER_SIZE);
-		file->i = 0;
 		if (file->rd < 0)
 			return (-1);
 		if (file->rd == 0)
 			return (0);
+		file->i = 0;
 	}
+	if (file->i < 0 || file->i >= BUFFER_SIZE)
+		return (-1);
 	return (file->buf[file->i++]);
 }
