@@ -9,129 +9,68 @@
 /*   Updated: 2024/12/05 18:07:34 by lukorman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 #include "get_next_line.h"
 
-char	*ft_strjoin(char const *s1, char const *s2)
-{
-	size_t	len1;
-	size_t	len2;
-	char	*ptr;
+char	*build_line(t_buf_mngr **rd_chrs, size_t line_len, int last_chr);
 
-	if (!s1 && !s2)
+char	*read_line_from_file(t_read_file *file)
+{
+	t_buf_mngr	*rd_chrs;
+	int			chr;
+	size_t		line_len;
+
+	rd_chrs = NULL;
+	line_len = 0;
+	while (1)
+	{
+		chr = read_next_char(file);
+		if (chr <= 0)
+			break ;
+		add_node(&rd_chrs, (char)chr);
+		line_len++;
+		if (chr == '\n')
+			break ;
+	}
+	if (!rd_chrs)
 		return (NULL);
-	len1 = ft_strlen(s1);
-	len2 = ft_strlen(s2);
-	ptr = (char *)malloc(len1 + len2 + 1);
-	if (!ptr)
-		return (NULL);
-	ft_memcpy(ptr, s1, len1);
-	ft_memcpy(ptr + len1, s2, len2);
-	ptr[len1 + len2] = '\0';
-	return (ptr);
+	return (build_line(&rd_chrs, line_len, chr));
 }
 
-static int	read_and_process(int fd, char **remainder)
+char	*build_line(t_buf_mngr **rd_chrs, size_t line_len, int last_chr)
 {
-	char	*buffer;
-	char	*temp;
-	ssize_t	bytes_read;
-
-	if (!remainder) 
-        return (-1);
-	buffer = malloc(BUFFER_SIZE + 1);
-	if (!buffer)
-		return (-1);
-
-	bytes_read = read(fd, buffer, BUFFER_SIZE);
-	if (bytes_read < 0)
-	{
-		free(buffer);
-		return (-1);
-	}
-	if (bytes_read == 0)
-    {
-        free(buffer);
-        return (0);
-    }
-	buffer[bytes_read] = '\0';
-	if (!*remainder)
-		*remainder = ft_strdup("");
-
-	temp = ft_strjoin(*remainder, buffer);
-	free(buffer);
-	if (!temp)
-	{
-		free(*remainder);
-		*remainder = NULL;
-		return (-1);
-	}
-
-	free(*remainder);
-	*remainder = temp;
-	return (bytes_read);
-}
-
-static char	*extract_line(char **remainder)
-{
-	char	*newline;
 	char	*line;
-	char	*temp;
 
-	if (!remainder || !*remainder || **remainder == '\0')
-		return (NULL);
-	newline = NULL;
-	temp = NULL;
-	newline = ft_strchr(*remainder, '\n');
-	if (newline)
+	line = write_str(*rd_chrs, line_len);
+	free_list(rd_chrs);
+	if (last_chr == -1)
 	{
-		line = ft_substr(*remainder, 0, newline - *remainder + 1);
-		temp = ft_strdup(newline + 1);
-		if (!line || !temp)
-		{
-			free(line);
-			free(temp);
-			return (NULL);
-		}
-		free(*remainder);
-		*remainder = temp;
-		return (line);
+		free(line);
+		return (NULL);
 	}
-	line = ft_strdup(*remainder);
-	free(*remainder);
-	*remainder = NULL;
 	return (line);
 }
 
 char	*get_next_line(int fd)
 {
-	static char	*remainder[1024];
-	char		*line;
-	int			read_result;
+	static t_read_file	file[1024];
+	char				*line;
 
-	if (fd < 0 || BUFFER_SIZE <= 0 || fd >= 1024)
+	if (fd < 0 || fd >= 1024 || BUFFER_SIZE <= 0)
 		return (NULL);
-	while (1)
+	if (file[fd].rd == 0 && file[fd].i == 0)
 	{
-		if (remainder[fd] && ft_strchr(remainder[fd], '\n'))
-			break ;
-		read_result = read_and_process(fd, &remainder[fd]);
-		if (read_result < 0)
-		{
-			free(remainder[fd]);
-			remainder[fd] = NULL;
+		file[fd].fd = fd;
+		file[fd].buf = malloc(BUFFER_SIZE);
+		if (!file[fd].buf)
 			return (NULL);
-		}
-		if (read_result == 0)
-			break ;
 	}
-
-	line = extract_line(&remainder[fd]);
+	line = read_line_from_file(&file[fd]);
 	if (!line)
 	{
-		free(remainder[fd]);
-		remainder[fd] = NULL;
+		free(file[fd].buf);
+		file[fd].buf = NULL;
+		file[fd].i = 0;
+		file[fd].rd = 0;
 	}
-
 	return (line);
 }

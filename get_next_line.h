@@ -10,23 +10,38 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+
 #ifndef GET_NEXT_LINE_H
 # define GET_NEXT_LINE_H
-
-# ifndef BUFFER_SIZE
-#  define BUFFER_SIZE 8192
-# endif
-
-# define SIZE_MAX 65535
 
 # include <unistd.h>
 # include <stdlib.h>
 
+# ifndef BUFFER_SIZE
+#  define BUFFER_SIZE 42
+# endif
+
+typedef struct s_buf_mngr	t_buf_mngr;
+struct s_buf_mngr
+{
+	char		act_char;
+	t_buf_mngr	*next;
+};
+
+typedef struct s_read_file	t_read_file;
+struct s_read_file
+{
+	int			fd;
+	char		*buf;
+	ssize_t		i;
+	ssize_t		rd;
+};
+
 char		*get_next_line(int fd);
-char		*ft_strchr(const char *s, int c);
-char		*ft_strdup(const char *s);
-char		*ft_substr(char const *s, unsigned int start, size_t len);
-size_t		ft_strlen(const char *s);
-void		*ft_memcpy(void *dest, const void *src, size_t n);
+int			read_next_char(t_read_file *file);
+void		add_node(t_buf_mngr **head, char c);
+char		*write_str(t_buf_mngr *head, size_t len);
+void		*free_list(t_buf_mngr **head);
+t_buf_mngr	*create_node(char c);
 
 #endif
