@@ -1,17 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line_bonus.h                              :+:      :+:    :+:   */
+/*   get_next_line.h                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: lukorman <lukorman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/12/20 19:46:11 by lukorman          #+#    #+#             */
-/*   Updated: 2024/12/20 19:50:44 by lukorman         ###   ########.fr       */
+/*   Created: 2024/11/25 16:03:49 by lukorman          #+#    #+#             */
+/*   Updated: 2024/12/05 17:31:49 by lukorman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef GET_NEXT_LINE_BONUS_H
-# define GET_NEXT_LINE_BONUS_H
+#ifndef GET_NEXT_LINE_H
+# define GET_NEXT_LINE_H
 
 # include <unistd.h>
 # include <stdlib.h>
@@ -23,7 +23,7 @@
 typedef struct s_buf_mngr	t_buf_mngr;
 struct s_buf_mngr
 {
-	char		act_char;
+	char		*content;
 	t_buf_mngr	*next;
 };
 
@@ -37,10 +37,10 @@ struct s_read_file
 };
 
 char		*get_next_line(int fd);
-int			read_next_char(t_read_file *file);
-void		add_node(t_buf_mngr **head, char c);
-char		*write_str(t_buf_mngr *head, size_t len);
+int			read_next_chunk(t_read_file *file, char *chunk);
+t_buf_mngr	*add_node(t_buf_mngr **head, const char *str);
 void		*free_list(t_buf_mngr **head);
-t_buf_mngr	*create_node(char c);
+char        *gnl_strdup(const char *s);
+char	    *ft_strchr(const char *s, int c);
 
 #endif
