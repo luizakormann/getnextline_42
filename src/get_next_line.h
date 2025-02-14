@@ -6,7 +6,7 @@
 /*   By: lukorman <lukorman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 16:03:49 by lukorman          #+#    #+#             */
-/*   Updated: 2024/12/05 17:31:49 by lukorman         ###   ########.fr       */
+/*   Updated: 2025/02/14 20:37:06 by lukorman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,10 +37,10 @@ struct s_read_file
 };
 
 char		*get_next_line(int fd);
-int			read_next_chunk(t_read_file *file, char *chunk);
+size_t		read_next_chunk(t_read_file *file, char *chunk);
 t_buf_mngr	*add_node(t_buf_mngr **head, const char *str);
 void		*free_list(t_buf_mngr **head);
 char        *gnl_strdup(const char *s);
-char	    *ft_strchr(const char *s, int c);
+char	    *gnl_strchr(const char *s, int c);
 
 #endif

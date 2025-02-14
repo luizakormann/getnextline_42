@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line_utils.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: luiza <luiza@student.42.fr>                +#+  +:+       +#+        */
+/*   By: lukorman <lukorman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 16:03:58 by lukorman          #+#    #+#             */
-/*   Updated: 2025/02/02 13:01:47 by luiza            ###   ########.fr       */
+/*   Updated: 2025/02/14 20:37:06 by lukorman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,16 +62,24 @@ void	*free_list(t_buf_mngr **head)
 	return (NULL);
 }
 
-int	read_next_chunk(t_read_file *file, char *chunk)
+size_t	read_next_chunk(t_read_file *file, char *chunk)
 {
 	size_t	chunk_len;
+	ssize_t	check_read;
 
 	if (!file || !chunk || file->buf == NULL)
 		return (0);
 	chunk_len = 0;
 	if (file->i >= file->rd)
 	{
-        file->rd = read(file->fd, file->buf, BUFFER_SIZE);
+        check_read = read(file->fd, file->buf, BUFFER_SIZE);
+        if (check_read < 0)
+        {
+            file->rd = 0;
+            file->i = 0;
+            return (0);
+        }
+        file->rd = check_read;
         if (file->rd <= 0)
             return (0);
         file->i = 0;
@@ -83,7 +91,7 @@ int	read_next_chunk(t_read_file *file, char *chunk)
 			break ;
 	}
 	chunk[chunk_len] = '\0';
-	return ((int)chunk_len);
+	return (chunk_len);
 }
 
 char *gnl_strdup(const char *s)
@@ -110,7 +118,7 @@ char *gnl_strdup(const char *s)
     return (dup);
 }
 
-char	*ft_strchr(const char *s, int c)
+char	*gnl_strchr(const char *s, int c)
 {
 	unsigned char uc;
 	if (!s)

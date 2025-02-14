@@ -3,20 +3,18 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: luiza <luiza@student.42.fr>                +#+  +:+       +#+        */
+/*   By: lukorman <lukorman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 16:03:55 by lukorman          #+#    #+#             */
-/*   Updated: 2025/02/02 13:22:23 by luiza            ###   ########.fr       */
+/*   Updated: 2025/02/14 20:43:03 by lukorman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-#include <stdio.h>
 
 char	*read_line_from_file(t_read_file *file);
 char	*build_line(t_buf_mngr **rd_chrs, size_t total_len, int last_chunk);
 void	*ft_memcpy(void *dest, const void *src, size_t n);
-
 
 char	*get_next_line(int fd)
 {
@@ -25,7 +23,7 @@ char	*get_next_line(int fd)
 
 	if (fd < 0 || fd >= 1024 || BUFFER_SIZE <= 0)
 		return (NULL);
-	if (file[fd].buf == NULL|| file[fd].rd == 0)
+	if (file[fd].buf == NULL)
 	{
 		file[fd].fd = fd;
 		file[fd].buf = malloc(BUFFER_SIZE + 1);
@@ -35,13 +33,10 @@ char	*get_next_line(int fd)
 		file[fd].rd = 0;
 	}
 	line = read_line_from_file(&file[fd]);
-	if (!line)
+	if (!line &&  file[fd].rd <= 0)
 	{
-		if (file[fd].buf)
-		{
-            free(file[fd].buf);
-            file[fd].buf = NULL;
-        }
+
+		free(file[fd].buf);
 		file[fd].buf = NULL;
 		file[fd].i = 0;
 		file[fd].rd = 0;
@@ -52,38 +47,41 @@ char	*get_next_line(int fd)
 char	*read_line_from_file(t_read_file *file)
 {
 	t_buf_mngr	*rd_chrs;
-	char		chunk[BUFFER_SIZE + 1];
+	char		*chunk;
 	size_t		total_len;
 	size_t		chunk_len;
 	int			last_chunk;
 
 	rd_chrs = NULL;
-	chunk[BUFFER_SIZE] = '\0';
+	chunk = malloc(BUFFER_SIZE + 1);
+	if (!chunk)
+		return (NULL);
 	total_len = 0;
 	last_chunk = 0;
 	while (1)
 	{
 		chunk_len = read_next_chunk(file, chunk);
-		if (chunk_len <= 0)
+		if (chunk_len == 0)
+		{
+			last_chunk = -1;
 			break ;
+		}
 		if (!add_node(&rd_chrs, chunk))
 		{
+			free(chunk);
 			free_list(&rd_chrs);
 			return (NULL);
 		}
 		total_len += chunk_len;
-		if (ft_strchr(chunk, '\n'))
+		if (gnl_strchr(chunk, '\n'))
+		{
+			last_chunk = 1;
 			break ;
+		}
 	}
-	if (!rd_chrs)
-	{
-		free_list(&rd_chrs);
+	free(chunk);
+    if (!rd_chrs && last_chunk == -1)
 		return (NULL);
-	}
-	if (chunk_len > 0)
-		last_chunk = 1;
-	else
-		last_chunk = -1;
 	return (build_line(&rd_chrs, total_len, last_chunk));
 }
 
@@ -94,15 +92,15 @@ char	*build_line(t_buf_mngr **rd_chrs, size_t total_len, int last_chunk)
     char *line;
 	size_t offset;
 
-	if (!rd_chrs || *rd_chrs == NULL || total_len == 0)
+	if (!rd_chrs || !*rd_chrs || total_len == 0)
+	{
+		free_list(rd_chrs);
     	return (NULL);
+	}
 
 	line = malloc(total_len + 1);
-	printf("malloc OK");
-
     if (!line)
     {
-		printf("malloc ERRADO");
         free_list(rd_chrs);
         return (NULL);
     }
@@ -110,32 +108,25 @@ char	*build_line(t_buf_mngr **rd_chrs, size_t total_len, int last_chunk)
 	temp = *rd_chrs;
 	offset = 0;
 
-    while (temp)
+    while (temp && temp->content)
     {
-		printf("Copiando \"%s\" para a linha\n", temp->content);
-        if (temp->content)
-        {
-			content_len = 0;
-            while (temp->content[content_len])
-                content_len++;
-            if (offset + content_len <= total_len)
-			{
-                ft_memcpy(line + offset, temp->content, content_len);
-                offset += content_len;
-            }
-        }
+		content_len = 0;
+		while (temp->content[content_len])
+			content_len++;
+		ft_memcpy(line + offset, temp->content, content_len);
+		offset += content_len;
+
         *rd_chrs = temp->next;
         free(temp->content);
 		free(temp);
 		temp = *rd_chrs;
     }
     line[offset] = '\0';
-    if (last_chunk == -1)
+    if (last_chunk == -1 && offset == 0)
     {
         free(line);
         line = NULL;
     }
-	printf("Linha final gerada: \"%s\"\n", line);
     return (line);
 }
 void	*ft_memcpy(void *dest, const void *src, size_t n)
@@ -154,4 +145,3 @@ void	*ft_memcpy(void *dest, const void *src, size_t n)
     }
 	return (dest);
 }
-
