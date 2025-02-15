@@ -6,7 +6,7 @@
 /*   By: lukorman <lukorman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 16:03:55 by lukorman          #+#    #+#             */
-/*   Updated: 2025/02/14 21:14:31 by lukorman         ###   ########.fr       */
+/*   Updated: 2025/02/14 21:26:57 by lukorman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 
 char	*read_line_from_file(t_read_file *file);
 char	*build_line(t_buf_mngr **rd_chrs, size_t total_len, int last_chunk);
-void	*ft_memcpy(void *dest, const void *src, size_t n);
 
 char	*get_next_line(int fd)
 {
@@ -109,7 +108,7 @@ char	*build_line(t_buf_mngr **rd_chrs, size_t total_len, int last_chunk)
 		content_len = 0;
 		while (temp->content[content_len])
 			content_len++;
-		ft_memcpy(line + offset, temp->content, content_len);
+		gnl_memcpy(line + offset, temp->content, content_len);
 		offset += content_len;
 		*rd_chrs = temp->next;
 		free(temp->content);
@@ -123,21 +122,4 @@ char	*build_line(t_buf_mngr **rd_chrs, size_t total_len, int last_chunk)
 		line = NULL;
 	}
 	return (line);
-}
-
-void	*ft_memcpy(void *dest, const void *src, size_t n)
-{
-	unsigned char	*d;
-	unsigned char	*s;
-
-	if (!dest || !src)
-		return (NULL);
-	d = (unsigned char *)dest;
-	s = (unsigned char *)src;
-	if (dest != src)
-	{
-		while (n--)
-			*d++ = *s++;
-	}
-	return (dest);
 }
