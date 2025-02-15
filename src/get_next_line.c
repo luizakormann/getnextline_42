@@ -6,11 +6,11 @@
 /*   By: lukorman <lukorman@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 16:03:55 by lukorman          #+#    #+#             */
-/*   Updated: 2025/02/14 20:43:03 by lukorman         ###   ########.fr       */
+/*   Updated: 2025/02/14 21:14:31 by lukorman         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "../include/get_next_line.h"
 
 char	*read_line_from_file(t_read_file *file);
 char	*build_line(t_buf_mngr **rd_chrs, size_t total_len, int last_chunk);
@@ -33,9 +33,8 @@ char	*get_next_line(int fd)
 		file[fd].rd = 0;
 	}
 	line = read_line_from_file(&file[fd]);
-	if (!line &&  file[fd].rd <= 0)
+	if (!line || file[fd].rd <= 0)
 	{
-
 		free(file[fd].buf);
 		file[fd].buf = NULL;
 		file[fd].i = 0;
@@ -80,55 +79,52 @@ char	*read_line_from_file(t_read_file *file)
 		}
 	}
 	free(chunk);
-    if (!rd_chrs && last_chunk == -1)
+	if (!rd_chrs && last_chunk == -1)
 		return (NULL);
 	return (build_line(&rd_chrs, total_len, last_chunk));
 }
 
 char	*build_line(t_buf_mngr **rd_chrs, size_t total_len, int last_chunk)
 {
-    t_buf_mngr *temp;
-    size_t content_len;
-    char *line;
-	size_t offset;
+	t_buf_mngr	*temp;
+	size_t		content_len;
+	char		*line;
+	size_t		offset;
 
 	if (!rd_chrs || !*rd_chrs || total_len == 0)
 	{
 		free_list(rd_chrs);
-    	return (NULL);
+		return (NULL);
 	}
-
 	line = malloc(total_len + 1);
-    if (!line)
-    {
-        free_list(rd_chrs);
-        return (NULL);
-    }
-
+	if (!line)
+	{
+		free_list(rd_chrs);
+		return (NULL);
+	}
 	temp = *rd_chrs;
 	offset = 0;
-
-    while (temp && temp->content)
-    {
+	while (temp && temp->content)
+	{
 		content_len = 0;
 		while (temp->content[content_len])
 			content_len++;
 		ft_memcpy(line + offset, temp->content, content_len);
 		offset += content_len;
-
-        *rd_chrs = temp->next;
-        free(temp->content);
+		*rd_chrs = temp->next;
+		free(temp->content);
 		free(temp);
 		temp = *rd_chrs;
-    }
-    line[offset] = '\0';
-    if (last_chunk == -1 && offset == 0)
-    {
-        free(line);
-        line = NULL;
-    }
-    return (line);
+	}
+	line[offset] = '\0';
+	if (last_chunk == -1 && offset == 0)
+	{
+		free(line);
+		line = NULL;
+	}
+	return (line);
 }
+
 void	*ft_memcpy(void *dest, const void *src, size_t n)
 {
 	unsigned char	*d;
@@ -139,9 +135,9 @@ void	*ft_memcpy(void *dest, const void *src, size_t n)
 	d = (unsigned char *)dest;
 	s = (unsigned char *)src;
 	if (dest != src)
-    {
-        while (n--)
-            *d++ = *s++;
-    }
+	{
+		while (n--)
+			*d++ = *s++;
+	}
 	return (dest);
 }
