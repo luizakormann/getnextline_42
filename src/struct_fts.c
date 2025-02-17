@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   struct_fts.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lukorman <lukorman@student.42.fr>          +#+  +:+       +#+        */
+/*   By: luiza <luiza@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/02/14 21:22:51 by lukorman          #+#    #+#             */
-/*   Updated: 2025/02/14 21:23:48 by lukorman         ###   ########.fr       */
+/*   Created: 2025/02/17 10:52:24 by luiza             #+#    #+#             */
+/*   Updated: 2025/02/17 13:29:19 by luiza            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,4 +58,20 @@ void	*free_list(t_buf_mngr **head)
 	}
 	*head = NULL;
 	return (NULL);
+}
+
+void	process_temp_node(t_buf_mngr **rd_chrs, t_buf_mngr *temp)
+{
+	*rd_chrs = temp->next;
+	free(temp->content);
+	free(temp);
+}
+
+void	free_static_buffer(t_read_file *file)
+{
+	if (file->buf)
+	{
+		free(file->buf);
+		file->buf = NULL;
+	}
 }
