@@ -6,7 +6,7 @@
 /*   By: luiza <luiza@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 21:36:35 by luiza             #+#    #+#             */
-/*   Updated: 2025/02/17 13:52:05 by luiza            ###   ########.fr       */
+/*   Updated: 2025/02/28 18:20:44 by luiza            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,19 +21,11 @@ static int	process_chunk(t_buf_mngr **rd_chrs, char *chunk,
 	return (1);
 }
 
-/*static int	init_read_line(t_buf_mngr **rd_chrs, char **chunk,
-			size_t *total_len, int *last_chunk)
-{
-
-	return (1);
-}*/
-
 static int	handle_chunk_read(t_buf_mngr **rd_chrs, char *chunk,
 			size_t chunk_len, size_t *total_len)
 {
 	if (!process_chunk(rd_chrs, chunk, chunk_len, total_len))
 	{
-		free(chunk);
 		free_list(rd_chrs);
 		return (0);
 	}
@@ -53,18 +45,20 @@ ssize_t read_next_chunk(t_read_file *file, char *chunk)
 		if (file->i >= file->rd)
 		{
 			check_read = read(file->fd, file->buf, BUFFER_SIZE);
-			if (check_read <= 0)
+			if (check_read < 0)
 			{
-				if (chunk_len > 0)
-					return (chunk_len);
-				return (check_read);
+				free(file->buf);
+				file->buf = NULL;
+				return (-1);
 			}
+			if (check_read == 0)
+				return (0);
 			file->rd = check_read;
 			file->i = 0;
 		}
 		chunk[chunk_len++] = file->buf[file->i++];
-		if (file->buf[file->i - 1] == '\n')
-			break;
+		if (file->buf[file->i - 1] == '\n' || file->i >= file->rd)
+			break ;
 	}
 	chunk[chunk_len] = '\0';
 	return (chunk_len);
@@ -87,13 +81,19 @@ char *read_line_from_file(t_read_file *file)
 	while (1)
 	{
 		chunk_len = read_next_chunk(file, chunk);
-		if (chunk_len < 0 && !rd_chrs)
+		if (chunk_len < 0)
 		{
 			free(chunk);
+			free_list(&rd_chrs);
 			return (NULL);
 		}
-		if (chunk_len <= 0)
-			break;
+		if (chunk_len == 0)
+		{
+			free(chunk);
+			if (!rd_chrs)
+				return (NULL);
+			return (build_line(&rd_chrs, total_len, 0));
+		}
 		if (!handle_chunk_read(&rd_chrs, chunk, chunk_len, &total_len))
 		{
 			free(chunk);
@@ -102,7 +102,7 @@ char *read_line_from_file(t_read_file *file)
 		if (gnl_strchr(chunk, '\n'))
 		{
 			last_chunk = 1;
-			break;
+			break ;
 		}
 	}
 	free(chunk);

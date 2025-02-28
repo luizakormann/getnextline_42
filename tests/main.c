@@ -6,11 +6,11 @@
 /*   By: luiza <luiza@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 20:30:25 by luiza             #+#    #+#             */
-/*   Updated: 2025/02/17 13:53:22 by luiza            ###   ########.fr       */
+/*   Updated: 2025/02/28 13:01:13 by luiza            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "../include/get_next_line.h"
 #include <stdio.h>
 #include <fcntl.h>
 

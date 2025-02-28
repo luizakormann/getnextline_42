@@ -6,12 +6,11 @@
 /*   By: luiza <luiza@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 16:03:55 by lukorman          #+#    #+#             */
-/*   Updated: 2025/02/17 13:35:05 by luiza            ###   ########.fr       */
+/*   Updated: 2025/02/28 13:00:56 by luiza            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/get_next_line.h"
-//#include "get_next_line.h"
 
 char	*get_next_line(int fd)
 {
