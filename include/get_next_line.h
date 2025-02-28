@@ -6,7 +6,7 @@
 /*   By: luiza <luiza@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 16:03:49 by lukorman          #+#    #+#             */
-/*   Updated: 2025/02/17 13:29:46 by luiza            ###   ########.fr       */
+/*   Updated: 2025/02/28 18:32:19 by luiza            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ typedef struct s_buf_mngr
 {
 	char				*content;
 	struct s_buf_mngr	*next;
-} t_buf_mngr;
+}	t_buf_mngr;
 
 typedef struct s_read_file
 {
@@ -33,7 +33,7 @@ typedef struct s_read_file
 	char		*buf;
 	ssize_t		i;
 	ssize_t		rd;
-} t_read_file;
+}	t_read_file;
 
 char		*get_next_line(int fd);
 char		*read_line_from_file(t_read_file *file);
@@ -50,6 +50,5 @@ char		*process_build_line(char *line, size_t offset, int last_chunk);
 ssize_t		read_next_chunk(t_read_file *file, char *chunk);
 char		*process_read_line(t_buf_mngr *rd_chrs, size_t total_len,
 				int last_chunk);
-
 
 #endif

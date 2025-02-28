@@ -6,7 +6,7 @@
 /*   By: luiza <luiza@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 21:36:35 by luiza             #+#    #+#             */
-/*   Updated: 2025/02/28 18:20:44 by luiza            ###   ########.fr       */
+/*   Updated: 2025/02/28 18:31:02 by luiza            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,10 +32,10 @@ static int	handle_chunk_read(t_buf_mngr **rd_chrs, char *chunk,
 	return (1);
 }
 
-ssize_t read_next_chunk(t_read_file *file, char *chunk)
+ssize_t	read_next_chunk(t_read_file *file, char *chunk)
 {
-	size_t  chunk_len;
-	ssize_t check_read;
+	size_t	chunk_len;
+	ssize_t	check_read;
 
 	if (!file || !chunk || !file->buf)
 		return (-1);
@@ -64,13 +64,13 @@ ssize_t read_next_chunk(t_read_file *file, char *chunk)
 	return (chunk_len);
 }
 
-char *read_line_from_file(t_read_file *file)
+char	*read_line_from_file(t_read_file *file)
 {
-	t_buf_mngr  *rd_chrs;
-	char        *chunk;
-	size_t      total_len;
-	ssize_t     chunk_len;
-	int         last_chunk;
+	t_buf_mngr	*rd_chrs;
+	char		*chunk;
+	size_t		total_len;
+	ssize_t		chunk_len;
+	int			last_chunk;
 
 	rd_chrs = NULL;
 	chunk = malloc(BUFFER_SIZE + 1);

@@ -6,7 +6,7 @@
 /*   By: luiza <luiza@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 20:30:25 by luiza             #+#    #+#             */
-/*   Updated: 2025/02/28 13:01:13 by luiza            ###   ########.fr       */
+/*   Updated: 2025/02/28 18:38:59 by luiza            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 
-int main(int argc, char **argv)
+int	main(int argc, char **argv)
 {
 	int		fd;
 	char	*line;
@@ -29,10 +29,12 @@ int main(int argc, char **argv)
 			return (1);
 		}
 	}
-	while ((line = get_next_line(fd)) != NULL)
+	line = get_next_line(fd);
+	while (line != NULL)
 	{
 		printf("%s", line);
 		free(line);
+		line = get_next_line(fd);
 	}
 	if (argc == 2)
 		close(fd);
