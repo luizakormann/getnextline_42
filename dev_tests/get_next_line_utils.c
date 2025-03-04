@@ -6,7 +6,7 @@
 /*   By: luiza <luiza@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 21:36:35 by luiza             #+#    #+#             */
-/*   Updated: 2025/03/03 23:21:18 by luiza            ###   ########.fr       */
+/*   Updated: 2025/03/03 23:29:45 by luiza            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -153,10 +153,31 @@ t_buf_mngr	*find_or_create_node(t_buf_mngr **list, int fd)
 	return (node);
 }
 
+static int	handle_read_error(char *buffer)
+{
+	free(buffer);
+	return (-1);
+}
+
+static int	process_buffer(int fd, char *buffer, char **content)
+{
+	int		bytes;
+	char	*temp;
+
+	bytes = read(fd, buffer, BUFFER_SIZE);
+	if (bytes < 0)
+		return (-1);
+	buffer[bytes] = '\0';
+	temp = gnl_strjoin(*content, buffer);
+	if (!temp)
+		return (-1);
+	*content = temp;
+	return (bytes);
+}
+
 int	read_to_buffer(int fd, char **content)
 {
 	char	*buffer;
-	char	*temp;
 	int		bytes;
 
 	buffer = (char *)malloc(sizeof(char) * (BUFFER_SIZE + 1));
@@ -165,23 +186,29 @@ int	read_to_buffer(int fd, char **content)
 	bytes = 1;
 	while (!gnl_strchr(*content, '\n') && bytes > 0)
 	{
-		bytes = read(fd, buffer, BUFFER_SIZE);
+		bytes = process_buffer(fd, buffer, content);
 		if (bytes < 0)
-		{
-			free(buffer);
-			return (-1);
-		}
-		buffer[bytes] = '\0';
-		temp = gnl_strjoin(*content, buffer);
-		if (!temp)
-		{
-			free(buffer);
-			return (-1);
-		}
-		*content = temp;
+			return (handle_read_error(buffer));
 	}
 	free(buffer);
 	return (bytes);
+}
+
+static void	free_and_set_null(char **ptr)
+{
+	free(*ptr);
+	*ptr = NULL;
+}
+
+static char	*get_line_content(char **content, int len)
+{
+	char	*line;
+
+	if ((*content)[len] == '\n')
+		line = gnl_substr(*content, 0, len + 1);
+	else
+		line = gnl_substr(*content, 0, len);
+	return (line);
 }
 
 char	*extract_line(char **content)
@@ -192,17 +219,13 @@ char	*extract_line(char **content)
 
 	if (!*content || **content == '\0')
 	{
-		free(*content);
-		*content = NULL;
+		free_and_set_null(content);
 		return (NULL);
 	}
 	len = 0;
 	while ((*content)[len] && (*content)[len] != '\n')
 		len++;
-	if ((*content)[len] == '\n')
-		line = gnl_substr(*content, 0, len + 1);
-	else
-		line = gnl_substr(*content, 0, len);
+	line = get_line_content(content, len);
 	if (!line)
 		return (NULL);
 	if ((*content)[len] == '\0')

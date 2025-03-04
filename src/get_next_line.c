@@ -6,58 +6,32 @@
 /*   By: luiza <luiza@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 16:03:55 by lukorman          #+#    #+#             */
-/*   Updated: 2025/03/03 21:23:29 by luiza            ###   ########.fr       */
+/*   Updated: 2025/03/03 23:43:37 by luiza            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/get_next_line.h"
 
-static int	init_file_buffer(t_read_file *file, int fd)
-{
-	file->fd = fd;
-	file->i = 0;
-	file->rd = 0;
-	return (1);
-}
-
-static void	cleanup_file_buffer(t_read_file *file)
-{
-	free_static_buffer(file);
-	file->i = 0;
-	file->rd = 0;
-}
-
 char	*get_next_line(int fd)
 {
-	static t_read_file	file[1024];
+	static t_buf_mngr	*list;
+	t_buf_mngr			*node;
 	char				*line;
+	int					bytes;
 
-	if (fd < 0 || fd >= 1024 || BUFFER_SIZE <= 0)
+	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
-	if (file[fd].buf == NULL)
+	node = find_or_create_node(&list, fd);
+	if (!node)
+		return (NULL);
+	bytes = read_to_buffer(fd, &node->content);
+	if (bytes < 0)
 	{
-		file[fd].buf = malloc(BUFFER_SIZE + 1);
-		if (!file[fd].buf)
-			return (NULL);
-		if (!init_file_buffer(&file[fd], fd))
-		{
-			cleanup_file_buffer(&file[fd]);
-			return (NULL);
-		}
-	}
-	line = read_line_from_file(&file[fd]);
-	if (!line)
-	{
-		free_static_buffer(&file[fd]);
+		free_node(&list, fd);
 		return (NULL);
 	}
-	if (line[0] == '\0')
-	{
-		free(line);
-		free_static_buffer(&file[fd]);
-		return (NULL);
-	}
-	if (file[fd].rd <= 0)
-		free_static_buffer(&file[fd]);
+	line = extract_line(&node->content);
+	if (!line || !node->content)
+		free_node(&list, fd);
 	return (line);
 }

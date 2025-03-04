@@ -6,75 +6,75 @@
 /*   By: luiza <luiza@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 21:48:43 by luiza             #+#    #+#             */
-/*   Updated: 2025/03/01 22:58:19 by luiza            ###   ########.fr       */
+/*   Updated: 2025/03/03 23:53:33 by luiza            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/get_next_line.h"
 
-static int	init_build_line(t_buf_mngr **rd_chrs, char **line,
-			size_t total_len)
+static void	free_and_set_null(char **ptr)
 {
-	if (!rd_chrs || !*rd_chrs || total_len == 0)
-	{
-		free_list(rd_chrs);
-		return (0);
-	}
-	*line = malloc(total_len + 1);
-	if (!*line)
-	{
-		free_list(rd_chrs);
-		return (0);
-	}
-	return (1);
+	free(*ptr);
+	*ptr = NULL;
 }
 
-static size_t	copy_content(char *line, size_t offset, t_buf_mngr *temp)
+static char	*get_line_content(char **content, int len)
 {
-	size_t	content_len;
+	char	*line;
 
-	content_len = 0;
-	while (temp->content[content_len])
-		content_len++;
-	gnl_memcpy(line + offset, temp->content, content_len);
-	return (content_len);
-}
-
-char	*process_read_line(t_buf_mngr *rd_chrs,
-			size_t total_len, int last_chunk)
-{
-	if (!rd_chrs || last_chunk == -1)
-		return (NULL);
-	return (build_line(&rd_chrs, total_len, last_chunk));
-}
-
-char	*process_build_line(char *line, size_t offset, int last_chunk)
-{
-	if (last_chunk == -1 && offset == 0)
-	{
-		if (line)
-			free(line);
-		return (NULL);
-	}
+	if ((*content)[len] == '\n')
+		line = gnl_substr(*content, 0, len + 1);
+	else
+		line = gnl_substr(*content, 0, len);
 	return (line);
 }
 
-char	*build_line(t_buf_mngr **rd_chrs, size_t total_len, int last_chunk)
+char	*extract_line(char **content)
 {
-	t_buf_mngr	*temp;
-	char		*line;
-	size_t		offset;
+	char	*line;
+	char	*temp;
+	int		len;
 
-	if (!init_build_line(rd_chrs, &line, total_len))
-		return (NULL);
-	temp = *rd_chrs;
-	offset = 0;
-	while (temp && temp->content)
+	if (!*content || **content == '\0')
 	{
-		offset += copy_content(line, offset, temp);
-		process_temp_node(rd_chrs, temp);
-		temp = *rd_chrs;
+		free_and_set_null(content);
+		return (NULL);
 	}
-	line[offset] = '\0';
-	return (process_build_line(line, offset, last_chunk));
+	len = 0;
+	while ((*content)[len] && (*content)[len] != '\n')
+		len++;
+	line = get_line_content(content, len);
+	if (!line)
+		return (NULL);
+	if ((*content)[len] == '\0')
+		temp = NULL;
+	else
+		temp = gnl_strdup(*content + len + 1);
+	free(*content);
+	*content = temp;
+	return (line);
+}
+
+void	free_node(t_buf_mngr **list, int fd)
+{
+	t_buf_mngr	*current;
+	t_buf_mngr	*prev;
+
+	current = *list;
+	prev = NULL;
+	while (current)
+	{
+		if (current->fd == fd)
+		{
+			if (prev)
+				prev->next = current->next;
+			else
+				*list = current->next;
+			free(current->content);
+			free(current);
+			return ;
+		}
+		prev = current;
+		current = current->next;
+	}
 }
