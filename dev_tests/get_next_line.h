@@ -6,7 +6,7 @@
 /*   By: luiza <luiza@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 16:03:49 by lukorman          #+#    #+#             */
-/*   Updated: 2025/03/01 23:07:48 by luiza            ###   ########.fr       */
+/*   Updated: 2025/03/03 23:19:48 by luiza            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,37 +23,20 @@
 
 typedef struct s_buf_mngr
 {
+	int					fd;
 	char				*content;
 	struct s_buf_mngr	*next;
 }	t_buf_mngr;
 
-typedef struct s_read_file
-{
-	int			fd;
-	char		*buf;
-	ssize_t		i;
-	ssize_t		rd;
-}	t_read_file;
-
 char		*get_next_line(int fd);
-char		*read_line_from_file(t_read_file *file);
-t_buf_mngr	*add_node(t_buf_mngr **head, const char *str);
-void		*free_list(t_buf_mngr **head);
-void		free_static_buffer(t_read_file *file);
-void		process_temp_node(t_buf_mngr **rd_chrs, t_buf_mngr *temp);
+t_buf_mngr	*find_or_create_node(t_buf_mngr **list, int fd);
+int			read_to_buffer(int fd, char **content);
+char		*extract_line(char **content);
+void		free_node(t_buf_mngr **list, int fd);
+char		*gnl_substr(char *s, unsigned int start, size_t len);
+size_t		gnl_strlen(const char *s);
 char		*gnl_strchr(const char *s, int c);
+char		*gnl_strjoin(char *s1, char *s2);
 char		*gnl_strdup(const char *s);
 void		*gnl_memcpy(void *dest, const void *src, size_t n);
-char		*build_line(t_buf_mngr **rd_chrs, size_t total_len,
-				int last_chunk);
-char		*process_build_line(char *line, size_t offset, int last_chunk);
-ssize_t		read_next_chunk(t_read_file *file, char *chunk);
-char		*process_read_line(t_buf_mngr *rd_chrs, size_t total_len,
-				int last_chunk);
-int	process_chunk(t_buf_mngr **rd_chrs, char *chunk, size_t chunk_len,
-				 size_t *total_len);
-int	handle_chunk_read(t_buf_mngr **rd_chrs, char *chunk, size_t chunk_len,
-				size_t *total_len);
-void	ft_bzero(void *s, size_t n);
-
 #endif

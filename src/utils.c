@@ -6,7 +6,7 @@
 /*   By: luiza <luiza@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 16:03:58 by lukorman          #+#    #+#             */
-/*   Updated: 2025/02/28 13:01:49 by luiza            ###   ########.fr       */
+/*   Updated: 2025/03/01 23:07:30 by luiza            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,4 +99,18 @@ size_t	gnl_strncat(char *dst, const char *src, size_t size)
 	}
 	dst[dlen + i] = '\0';
 	return (dlen + slen);
+}
+
+void	ft_bzero(void *s, size_t n)
+{
+	unsigned char	*str;
+	size_t			i;
+
+	str = (unsigned char *)s;
+	i = 0;
+	while (i < n)
+	{
+		str[i] = '\0';
+		i++;
+	}
 }

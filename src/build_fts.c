@@ -6,7 +6,7 @@
 /*   By: luiza <luiza@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/16 21:48:43 by luiza             #+#    #+#             */
-/*   Updated: 2025/02/28 18:28:39 by luiza            ###   ########.fr       */
+/*   Updated: 2025/03/01 22:58:19 by luiza            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ static size_t	copy_content(char *line, size_t offset, t_buf_mngr *temp)
 char	*process_read_line(t_buf_mngr *rd_chrs,
 			size_t total_len, int last_chunk)
 {
-	if (!rd_chrs && last_chunk == -1)
+	if (!rd_chrs || last_chunk == -1)
 		return (NULL);
 	return (build_line(&rd_chrs, total_len, last_chunk));
 }
@@ -52,7 +52,8 @@ char	*process_build_line(char *line, size_t offset, int last_chunk)
 {
 	if (last_chunk == -1 && offset == 0)
 	{
-		free(line);
+		if (line)
+			free(line);
 		return (NULL);
 	}
 	return (line);
