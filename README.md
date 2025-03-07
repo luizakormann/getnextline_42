@@ -40,6 +40,64 @@ get_next_line/
 ├── README.md                    # Project documentation
 ```
 
+## 🌀 Project Flow
+Find below a detailed explanation of how the data flows through the various functions in the project:
+
+### 1. **Main Entry**: `get_next_line(int fd)`
+
+The entry point of the program is the `get_next_line` function. It takes a file descriptor (`fd`) as input and returns a line of text read from the file associated with that descriptor.
+
+*   **Input:** A file descriptor (`fd`) representing the file or input stream to read from.
+*   **Output:** A line of text, including the newline character if present, or `NULL` if no more data is available.
+
+#### Flow:
+
+1.  **Find or Create Node**: The function first checks if a node corresponding to the file descriptor exists. If not, it creates a new node in a static linked list (`find_or_create_node`).
+2.  **Read to Buffer**: The function then attempts to read data into the buffer (`read_to_buffer`). If the buffer contains a newline character (`\n`), it stops reading further.
+3.  **Extract Line**: Once data is in the buffer, the `extract_line` function is called to retrieve the first line from the content stored in the node.
+4.  **Memory Management**: If the line is successfully extracted, the function returns it. If no more content is available or an error occurs, the corresponding node is freed (`free_node`), and `NULL` is returned.
+
+### 2. **Node Management: `find_or_create_node` and `free_node`**
+
+*   **Input:** A file descriptor (`fd`).
+*   **Output:** A pointer to the existing or newly created node, or the freed memory of the node.
+
+#### Flow:
+
+1.  **Find or Create Node**: The `find_or_create_node` function checks if there is an existing node for the given file descriptor. If it exists, it returns the node. If the node does not exist, a new node is created, initialized with the given `fd`, and added to the linked list.
+2.  **Free Node**: The `free_node` function is used to free the memory allocated for a node once it is no longer needed, ensuring no memory leaks.
+
+### 3. **Buffer Handling: `read_to_buffer` and `process_buffer`**
+
+*   **Input:** File descriptor (`fd`), a pointer to the content buffer.
+*   **Output:** The number of bytes read, or `-1` if there’s an error.
+
+#### Flow:
+
+1.  **Buffer Allocation**: The `read_to_buffer` function allocates memory for a buffer.
+2.  **Read Data**: It repeatedly calls `process_buffer` to read data into the buffer until a newline character is found or the end of the file is reached.
+3.  **Memory Management**: The function ensures that the content buffer is dynamically updated and freed as necessary.
+
+### 4. **Line Extraction: `extract_line`**
+
+*   **Input:** A pointer to the content buffer.
+*   **Output:** A string containing the extracted line, or `NULL` if no line is available.
+
+#### Flow:
+
+1.  **Find Line**: The function scans the content buffer for a newline character (`\n`) or the end of the string.
+2.  **Create Line**: Once a line is found, a new string containing the line is created (`gnl_substr`), and the remaining content is stored back into the node.
+3.  **Return Line**: The function returns the extracted line, or `NULL` if no more data is available.
+
+### 5. **Utility Functions**
+
+Various utility functions (`gnl_memcpy`, `gnl_strdup`, `gnl_strjoin`, etc.) are used throughout the project to manage strings and memory:
+
+*   **`gnl_memcpy`**: Copies memory between two buffers.
+*   **`gnl_strdup`**: Duplicates a string.
+*   **`gnl_strjoin`**: Joins two strings.
+*   **`gnl_strlen`**: Returns the length of a string.
+
 ## ⚙️ Compilation and Usage
 ### Requirements
  - GCC or another compatible C compiler.
