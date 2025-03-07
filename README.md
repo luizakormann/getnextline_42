@@ -36,9 +36,6 @@ get_next_line/
 │   ├── struct_fts.c           # Linked list structure management
 │   ├── utils.c                # Utility functions (string manipulation, memory handling)
 │  
-├── test/
-│   ├── main.c                 # Test file for the function
-│  
 ├── Makefile                    # Compilation rules
 ├── README.md                    # Project documentation
 ```
@@ -70,7 +67,7 @@ This project provided valuable insights into:
 
  - **Dynamic Memory Management**: Implementing `get_next_line` reinforced concepts of heap allocation, buffer manipulation, and memory safety.
  - **Linked Lists**: I deliberately used linked lists to strengthen my understanding, efficiently managing multiple file descriptors and optimizing buffer handling.
- - **Wrappers and Function Pointers**: Deepened my knowledge of modularization and abstraction in C. I leveraged `static` variables in `get_next_line` to persist data between function calls, enabling efficient buffer reuse while maintaining function scope and avoiding unnecessary global variables. This approach improved both memory efficiency and readability.
+ - **Modularization and Use of static Variables**: Deepened my knowledge of modularization and abstraction in C by using `static` variables in `get_next_line` to persist data between function calls, enabling efficient buffer reuse while maintaining function scope and avoiding unnecessary global variables. This approach improved both memory efficiency and readability.
  - **Project Evolution & Optimization**: My initial implementation used a `struct` that stored data character by character. After completing the project, I refactored it to read full strings, improving efficiency and making the `gnl.a` library reusable for future projects, such as **Minitalk**, the project I am currently working on.
 ## 👩‍💻 Author
 This project was developed by Luiza Kormann (lukorman@student.42.fr) as part of the 42 São Paulo curriculum.
