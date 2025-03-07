@@ -1,4 +1,4 @@
-# get next line
+# get_next_line
 
 Get Next Line is a project from **42 São Paulo**.
 The get_next_line function reads a file descriptor line by line. It efficiently manages multiple file descriptors using a static linked list to preserve reading states across calls. My implementation ensures memory optimization and proper buffer handling.
